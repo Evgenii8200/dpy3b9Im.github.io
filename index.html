@@ -292,31 +292,26 @@
       ];
 
       function createMiniBoxes() {
-  miniBoxesContainer.innerHTML = '';
-  const count = poems.length;
-  for (let i = 0; i < count; i++) {
-    const box = document.createElement('div');
-    box.className = 'mini-box';
-    box.onclick = () => showPoem(i);
+        miniBoxesContainer.innerHTML = '';
+        const count = poems.length;
+        for (let i = 0; i < count; i++) {
+          const box = document.createElement('div');
+          box.className = 'mini-box';
+          box.onclick = () => showPoem(i);
 
-    const labelSpan = document.createElement('span');
-    labelSpan.textContent = labels[i];
-    box.appendChild(labelSpan);
+          const labelSpan = document.createElement('span');
+          labelSpan.textContent = labels[i];
+          box.appendChild(labelSpan);
 
-    const angle = (i / count) * Math.PI * 2;
+          const angle = (i / count) * Math.PI * 2;
+          const dx = Math.cos(angle) * 170;
+          const dy = Math.sin(angle) * 170;
+          box.style.setProperty('--dx', dx + 'px');
+          box.style.setProperty('--dy', dy + 'px');
 
-    // Радиус теперь лучше адаптирован под мобильные экраны
-    const radius = Math.min(120, window.innerWidth * 0.22);
-    const dx = Math.cos(angle) * radius;
-    const dy = Math.sin(angle) * radius;
-
-    box.style.setProperty('--dx', dx + 'px');
-    box.style.setProperty('--dy', dy + 'px');
-
-    miniBoxesContainer.appendChild(box);
-  }
-}
-
+          miniBoxesContainer.appendChild(box);
+        }
+      }
 
       createMiniBoxes();
 
