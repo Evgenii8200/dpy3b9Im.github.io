@@ -291,7 +291,7 @@
         "Стрелец", "Козерог", "Водолей", "Рыбы"
       ];
 
-      function createMiniBoxes() {
+            function createMiniBoxes() {
         miniBoxesContainer.innerHTML = '';
         const count = poems.length;
         for (let i = 0; i < count; i++) {
@@ -304,8 +304,13 @@
           box.appendChild(labelSpan);
 
           const angle = (i / count) * Math.PI * 2;
-          const dx = Math.cos(angle) * 170;
-          const dy = Math.sin(angle) * 170;
+
+          // --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
+          const radius = Math.min(140, window.innerWidth * 0.28);
+          const dx = Math.cos(angle) * radius;
+          const dy = Math.sin(angle) * radius;
+          // -------------------------
+
           box.style.setProperty('--dx', dx + 'px');
           box.style.setProperty('--dy', dy + 'px');
 
@@ -314,6 +319,11 @@
       }
 
       createMiniBoxes();
+
+      // Пересоздаём коробочки при изменении размера окна, чтобы на телефоне после поворота всё было красиво
+      window.addEventListener('resize', () => {
+        createMiniBoxes();
+      });
 
       let isOpen = false;
 
