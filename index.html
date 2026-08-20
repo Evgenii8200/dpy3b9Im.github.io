@@ -235,22 +235,6 @@
       .close-poem:hover {
         background: #34495e;
       }
-      #miniBoxes {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 1px;
-  height: 1px;
-  overflow: visible;
-  pointer-events: none; /* чтобы контейнер не мешал кликам */
-}
-
-.mini-box {
-  /* Убираем любые относительные смещения, которые могли быть */
-  position: absolute;
-  /* Остальные свойства оставь как были: width, border, flex и т.д. */
-}
     </style>
   </head>
   <body>
@@ -308,55 +292,26 @@
       ];
 
       function createMiniBoxes() {
-  miniBoxesContainer.innerHTML = '';
-  const count = poems.length;
+        miniBoxesContainer.innerHTML = '';
+        const count = poems.length;
+        for (let i = 0; i < count; i++) {
+          const box = document.createElement('div');
+          box.className = 'mini-box';
+          box.onclick = () => showPoem(i);
 
-  // Центр экрана (а не контейнера) — это гарантирует центрирование на любом устройстве
-  const centerX = window.innerWidth / 2;
-  const centerY = window.innerHeight / 2;
+          const labelSpan = document.createElement('span');
+          labelSpan.textContent = labels[i];
+          box.appendChild(labelSpan);
 
-  for (let i = 0; i < count; i++) {
-    const box = document.createElement('div');
-    box.className = 'mini-box';
-    box.onclick = () => showPoem(i);
+          const angle = (i / count) * Math.PI * 2;
+          const dx = Math.cos(angle) * 170;
+          const dy = Math.sin(angle) * 170;
+          box.style.setProperty('--dx', dx + 'px');
+          box.style.setProperty('--dy', dy + 'px');
 
-    const labelSpan = document.createElement('span');
-    labelSpan.textContent = labels[i];
-    box.appendChild(labelSpan);
-
-    const angle = (i / count) * Math.PI * 2;
-
-    // Радиус чуть меньше — кольцо будет компактнее и точно в центре
-    const radius = Math.min(75, window.innerWidth * 0.22);
-
-    let dx = Math.cos(angle) * radius;
-    let dy = Math.sin(angle) * radius;
-
-    // Страховка: если коробочка вылезает за экран, подтягиваем её к центру
-    const boxSize = 44;
-    const halfSize = boxSize / 2;
-    const margin = 12; // небольшой отступ от краёв экрана
-
-    if (centerX + dx + halfSize > window.innerWidth - margin) {
-      dx -= (centerX + dx + halfSize - (window.innerWidth - margin));
-    }
-    if (centerX + dx - halfSize < margin) {
-      dx += (margin - (centerX + dx - halfSize));
-    }
-    if (centerY + dy + halfSize > window.innerHeight - margin) {
-      dy -= (centerY + dy + halfSize - (window.innerHeight - margin));
-    }
-    if (centerY + dy - halfSize < margin) {
-      dy += (margin - (centerY + dy - halfSize));
-    }
-
-    box.style.setProperty('--dx', dx + 'px');
-    box.style.setProperty('--dy', dy + 'px');
-
-    miniBoxesContainer.appendChild(box);
-  }
-}
-
+          miniBoxesContainer.appendChild(box);
+        }
+      }
 
       createMiniBoxes();
 
