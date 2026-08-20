@@ -285,29 +285,60 @@
       ];
 
       function createMiniBoxes() {
-        miniBoxesContainer.innerHTML = '';
-        const count = poems.length;
-        for (let i = 0; i < count; i++) {
-          const box = document.createElement('div');
-          box.className = 'mini-box';
-          box.onclick = () => showPoem(i);
+  miniBoxesContainer.innerHTML = '';
+  const count = poems.length;
+  
+  // Получаем координаты центра большой коробки
+  const boxRect = bigBox.getBoundingClientRect();
+  const centerX = boxRect.left + boxRect.width / 2;
+  const centerY = boxRect.top + boxRect.height / 2;
 
-          const labelSpan = document.createElement('span');
-          labelSpan.textContent = labels[i];
-          box.appendChild(labelSpan);
+  for (let i = 0; i < count; i++) {
+    const box = document.createElement('div');
+    box.className = 'mini-box';
+    box.onclick = () => showPoem(i);
 
-          const angle = (i / count) * Math.PI * 2;
-          const radius = Math.min(120, window.innerWidth * 0.15);
-          const dx = Math.cos(angle) * radius;
-          const dy = Math.sin(angle) * radius;
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = labels[i];
+    box.appendChild(labelSpan);
 
-          box.style.setProperty('--dx', dx + 'px');
-          box.style.setProperty('--dy', dy + 'px');
+    const angle = (i / count) * Math.PI * 2;
 
-          miniBoxesContainer.appendChild(box);
-        }
-      }
+    // Уменьшенный радиус
+    const radius = Math.min(60, window.innerWidth * 0.12);
+    
+    let dx = Math.cos(angle) * radius;
+    let dy = Math.sin(angle) * radius;
 
+    // --- СТРАХОВКА ОТ ВЫЛЕТА ЗА ЭКРАН ---
+    // Проверяем, не выходит ли коробочка за левый/правый край
+    const boxSize = parseInt(window.getComputedStyle(box).width) || 48;
+    const halfSize = boxSize / 2;
+    
+    // Если правый край коробочки больше ширины экрана - подтягиваем к центру
+    if (centerX + dx + halfSize > window.innerWidth) {
+      dx -= (centerX + dx + halfSize - window.innerWidth);
+    }
+    // Если левый край коробочки меньше 0 - подтягиваем к центру
+    if (centerX + dx - halfSize < 0) {
+      dx += (0 - (centerX + dx - halfSize));
+    }
+
+    // То же самое для верха и низа
+    if (centerY + dy + halfSize > window.innerHeight) {
+      dy -= (centerY + dy + halfSize - window.innerHeight);
+    }
+    if (centerY + dy - halfSize < 0) {
+      dy += (0 - (centerY + dy - halfSize));
+    }
+    // ------------------------------------
+
+    box.style.setProperty('--dx', dx + 'px');
+    box.style.setProperty('--dy', dy + 'px');
+
+    miniBoxesContainer.appendChild(box);
+  }
+}
       createMiniBoxes();
 
       window.addEventListener('resize', () => {
