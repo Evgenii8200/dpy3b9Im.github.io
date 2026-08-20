@@ -126,28 +126,16 @@
       }
 
       /* Маленькие коробочки */
-      .mini-box {
+      .      #miniBoxes {
         position: absolute;
-        width: 64px;
-        height: 64px;
-        background: #fff;
-        border: 3px solid #ff9f43;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        opacity: 0;
-        transform: scale(0);
-        transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        z-index: 1;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.12);
-        flex-direction: column;
-        padding: 6px;
-        box-sizing: border-box;
-        text-align: center;
-        font-size: 11px;
-        color: #2c3e50;
-        border-radius: 8px;
+        /* Привязываем контейнер ровно к подарку */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        /* Важно: pointer-events: none у контейнера, но у коробочек его нет */
+        pointer-events: none;
+        z-index: 0;
       }
 
       .mini-box:nth-child(1)  { border-color: #ff6b6b; }
@@ -294,7 +282,7 @@
         "😕",
         "Андрюха наш — Рыба, плывёт сквозь дни и года,<br>То в облаках витает, то шепчет: «Вот это да!»<br>«Я чувствую… тут где‑то скрыт тайный смысл, точно,<br>Даже в пятнах на стене — судьба пишет строчки!» 😄<br>То вдруг загрустит над песней про дождь и туман,<br>То радостно крикнет: «Жизнь — это сплошной океан!»<br>Интуиция бьёт, как волна, напролом:<br>«Я знаю, что делать… ну, или почти что-то поймём!» 😁"
       ];
-            const labels = [
+      const labels = [
         "Не открывать",
         "Овен", "Телец", "Близнецы", "Рак",
         "Лев", "Дева", "Весы", "Скорпион",
@@ -305,13 +293,13 @@
         miniBoxesContainer.innerHTML = '';
         const count = poems.length;
 
-        // Получаем реальный размер и позицию подарка
-        const boxRect = bigBox.getBoundingClientRect();
-        const centerX = boxRect.width / 2;
-        const centerY = boxRect.height / 2;
+        // Важно: берём размеры именно контейнера, который мы позиционируем поверх подарка
+        const containerRect = miniBoxesContainer.getBoundingClientRect();
+        const centerX = containerRect.width / 2;
+        const centerY = containerRect.height / 2;
 
-        // Радиус кольца: на мобильных делаем меньше, чтобы коробочки не вылезали за экран
-        const radius = (window.innerWidth > 768) ? 170 : 130;
+        // Адаптивный радиус: на мобильных меньше, чтобы всё влезало
+        const radius = (window.innerWidth > 768) ? 170 : 120;
 
         for (let i = 0; i < count; i++) {
           const box = document.createElement('div');
@@ -321,12 +309,11 @@
           labelSpan.textContent = labels[i];
           box.appendChild(labelSpan);
 
-          // Вычисляем позицию на окружности относительно центра подарка
+          // Позиция на окружности относительно центра контейнера
           const angle = (i / count) * Math.PI * 2;
           const dx = Math.cos(angle) * radius;
           const dy = Math.sin(angle) * radius;
 
-          // Сохраняем смещения в CSS‑переменные для анимации
           box.style.setProperty('--dx', dx + 'px');
           box.style.setProperty('--dy', dy + 'px');
 
@@ -334,10 +321,11 @@
         }
       }
 
-      // Создаём коробочки сразу после загрузки скрипта
+      // Создаём коробочки после загрузки и после каждого изменения размера окна
       createMiniBoxes();
+      window.addEventListener('resize', createMiniBoxes);
 
-      // Делегирование клика: один слушатель на контейнере — надёжно и работает даже на мобильных
+      // Делегирование клика на контейнере — самый надёжный способ на мобильных
       miniBoxesContainer.addEventListener('click', (e) => {
         const box = e.target.closest('.mini-box');
         if (!box) return;
@@ -362,7 +350,7 @@
           boxes.forEach((b, idx) => {
             setTimeout(() => {
               b.classList.add('active', 'flying');
-            }, 40 + idx * 30); // небольшая задержка для эффекта «волны»
+            }, 40 + idx * 30);
           });
         }, 500);
       }
